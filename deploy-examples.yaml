@@ -1,3 +1,41 @@
+# kubectl create namespace loonytunes
+# kubectl -n loonytunes apply -f deploy-examples.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: redis
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - image: redis:latest
+          name: redis-container
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis-service
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -17,7 +55,7 @@ spec:
         app: statusboard
     spec:
       containers:
-      - image: enderwiggens/examples/status-board:0.0.1
+      - image: enderwiggens/labs:statusboard-0.0.1
         name: status-board
         ports:
         - containerPort: 3000
@@ -25,6 +63,19 @@ spec:
         env:
           - name: REDIS_HOST
             value: "redis-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: statusboard-service
+spec:
+  selector:
+    app: statusboard
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,4 +99,24 @@ spec:
         name: swiss-army-knife
         resources: {}
 status: {}
-
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: statusboard-ingress
+  annotations:
+    # Disable SSL redirect since nip.io is typically used over HTTP in local/dev environments
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: statusboard.10.0.128.154.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: statusboard-service  # ⚠️ Replace with your actual Service name if different
+                port:
+                  number: 3000
