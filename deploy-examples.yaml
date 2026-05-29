@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statusboard
+  name: statusboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statusboard
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: statusboard
+    spec:
+      containers:
+      - image: enderwiggens/examples/status-board:0.0.1
+        name: status-board
+        ports:
+        - containerPort: 3000
+        resources: {}
+        env:
+          - name: REDIS_HOST
+            value: "redis-service"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: swiss-army-knife
+  name: swiss-army-knife
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: swiss-army-knife
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: swiss-army-knife
+    spec:
+      containers:
+      - image: leodotcloud/swiss-army-knife:v0.15
+        name: swiss-army-knife
+        resources: {}
+status: {}
+
