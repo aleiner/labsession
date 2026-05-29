@@ -78,7 +78,7 @@ metadata:
 spec:
   valuesContent: |-
     cluster:
-      name: <name (cluster-matt)>
+      name: <name (matt)>
       id: <# (use 2)>
     encryption:
       enabled: true
