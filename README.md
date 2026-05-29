@@ -66,3 +66,19 @@ curl -sfL https://get.rke2.io | sh -
 systemctl enable rke2-server.service 
 systemctl start rke2-server.service
 ```
+
+To enable Cilium Encryption via Wireguard, kubectl apply:
+
+```
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-cilium
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    encryption:
+      enabled: true
+      type: wireguard
+      nodeEncryption: true
+```
