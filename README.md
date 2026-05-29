@@ -77,6 +77,9 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+    cluster:
+      name: <name (cluster-matt)>
+      id: <# (use 2)>
     encryption:
       enabled: true
       type: wireguard
