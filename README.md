@@ -82,3 +82,9 @@ spec:
       type: wireguard
       nodeEncryption: true
 ```
+
+
+```
+# paste the above into cilium-config.yaml  
+kubectl apply -f cilium-config.yaml  
+```
