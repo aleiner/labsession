@@ -91,3 +91,48 @@ spec:
 # paste the above into cilium-config.yaml  
 kubectl apply -f cilium-config.yaml  
 ```
+
+# Combine kubeconfigs
+
+Edit each to rename common names to cluster specific
+
+```
+# 1. Tell kubectl to look at both files simultaneously
+export KUBECONFIG=./adam.yaml:./matt.yaml
+
+# 2. Flatten them into a single, unified configuration file
+kubectl config view --flatten > ./config-mesh
+
+#3. Verify
+export KUBECONFIG=config-mesh
+kubectl config get-contexts
+```
+
+# Configure Cluster mes
+```
+export C1=adam
+export C2=matt
+
+# Initialize Adam
+cilium clustermesh enable \
+  --context $C1 \
+  --namespace kube-system \
+  --helm-release-name rke2-cilium \
+  --service-type NodePort
+
+# Initialize Matt
+cilium clustermesh enable \
+  --context $C2 \
+  --namespace kube-system \
+  --helm-release-name rke2-cilium \
+  --service-type NodePort
+
+cilium clustermesh connect \
+  --context $C1 \
+  --destination-context $C2 \
+  --namespace kube-system \
+  --helm-release-name rke2-cilium \
+  --allow-mismatching-ca
+
+cilium clustermesh status --context $C1 --namespace kube-system
+```
